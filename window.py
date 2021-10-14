@@ -26,25 +26,27 @@ def generateModes(modesAmount):
 
 def plot():
     fig = plt.figure()
-    axis = fig.add_subplot()
+    ax = fig.add_subplot()
+    ax.set(title='Data Visualizer - modes and samples', xlabel='x', ylabel='y')
     modesAmount = 1
     samplesAmount = 4
     devRange = 0.25
-    x, y, label = generateModes(modesAmount)
 
+    x, y, label = generateModes(modesAmount)
     xn, yn = generateSamples(x, y, samplesAmount, devRange)
 
     for i in range(modesAmount):
-        axis.scatter(x, y, color='magenta', marker='*')
-        axis.scatter(xn, yn, color='magenta', marker='.')
+        ax.scatter(x, y, color='magenta', marker='s', label='Numbers')
+        ax.scatter(xn, yn, color='magenta', marker='.')
 
     x, y, label = generateModes(modesAmount)
 
     xn, yn = generateSamples(x, y, samplesAmount, devRange)
     for i in range(modesAmount):
-        axis.scatter(x, y, color='cyan', marker='*')
-        axis.scatter(xn, yn, color='cyan', marker='.')
+        ax.scatter(x, y, color='cyan', marker='s')
+        ax.scatter(xn, yn, color='cyan', marker='.')
 
+    plt.gca().legend(("1 class modes", "1 class sample", "2 class modes", "2 class sample"), loc="best")
     plt.show()
 
 
