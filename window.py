@@ -3,12 +3,13 @@ import random
 from matplotlib import pyplot as plt
 import tkinter
 import numpy as np
+from tkinter import *
 
 root = tkinter.Tk()
 root.title('Data')
 root.geometry('500x500')
 modesAmount = 1
-samplesAmount = 4
+samplesAmount = 0
 
 
 def generateSamples(xClass, yClass, samplesAmount):
@@ -28,7 +29,8 @@ def generateModes(modesAmount):
     return xClass, yClass, classLabel
 
 
-def plot():
+def plot(): 
+    samplesAmount = samplesAmountSlider.get()
     fig = plt.figure()
     ax = fig.add_subplot()
     ax.set(title='Data Visualizer - modes and samples', xlabel='x', ylabel='y')
@@ -49,6 +51,10 @@ def plot():
     plt.show()
 
 
+samplesAmountSliderlabel = Label(root, text="Please select number of samples").pack()
+samplesAmountSlider = Scale(root, from_=0 ,to=100, orient= HORIZONTAL)
+samplesAmountSlider.pack()
+
 buttonPlot = tkinter.Button(root, text="Plot", command=lambda: plot())
 buttonPlot.pack()
 
@@ -56,3 +62,4 @@ mainMenu = tkinter.Menu()
 root.config(menu=mainMenu)
 dataMenu = tkinter.Menu(mainMenu)
 root.mainloop()
+
