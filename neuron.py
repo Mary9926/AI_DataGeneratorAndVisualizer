@@ -12,29 +12,30 @@ class Neuron:
         print(self.weights)
 
     def neuronState(self, inputSamples):
-        return inputSamples@self.weights
+        return inputSamples @ self.weights
 
-    def trainNeuron(self, inputSamples, trainingOutputs, epochs):
+    def trainNeuron(self, inputSamples, trainingOutput, epochs):
         for i in range(epochs):
-            expectedOutput = self.learn(inputSamples)
-            error = trainingOutputs - expectedOutput
+            predictedOutput = self.learnNeuron(inputSamples)
+            error = trainingOutput - predictedOutput
             # performing weight adjustments
-            adjustments = error * self.activationFunctionDerivative(self.neuronState(inputSamples) * inputSamples)
-            self.weights += adjustments
+            self.weights += error * self.activationFunctionDerivative(self.neuronState(inputSamples)) * inputSamples
 
-
-    def learn(self, inputSamples):
-         return self.activationFunction(neuronState(inputSamples))
+    def learnNeuron(self, inputSamples):
+        return self.activationFunction(neuronState(inputSamples))
 
 
 def sigmoid(s):
     return 1 / (1 + np.exp(-s))
 
+
 def sigmoidDerivative(y):
     return y * (1 - y)
 
+
 def heaviside(s):
     return 0 if s < 0 else 1
+
 
 def heavisideDerivative(s):
     return 1
