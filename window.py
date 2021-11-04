@@ -1,5 +1,5 @@
 import random
-
+from neuron import  *
 from matplotlib import pyplot as plt
 import tkinter
 import numpy as np
@@ -10,6 +10,12 @@ root.title('Data')
 root.geometry('500x500')
 modesAmount = 1
 samplesAmount = 0
+
+def initNeuron():
+    Neuron()
+
+
+
 
 
 def generateSamples(xClass, yClass, samplesAmount):
@@ -57,6 +63,13 @@ samplesAmountSlider.pack()
 
 buttonPlot = tkinter.Button(root, text="Plot", command=lambda: plot())
 buttonPlot.pack()
+
+buttonPlot = tkinter.Button(root, text="Init Neuron", command=lambda: initNeuron())
+buttonPlot.pack()
+
+buttonPlot = tkinter.Button(root, text="Train neuron", command=lambda: plot())
+buttonPlot.pack()
+
 
 mainMenu = tkinter.Menu()
 root.config(menu=mainMenu)

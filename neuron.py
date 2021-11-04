@@ -2,28 +2,39 @@ import numpy as np
 from window import *
 
 
-class Neuron():
-    def __init__(self):
-        ng = np.random.default_rng()
-        self.weights = np.random.random(-1, 1)
+class Neuron:
+    def __init__(self, activationFunction, activationFunctionDerivative):
+        rng = np.random.default_rng()
+        # weights of a neuron with 2 inputs
+        self.weights = rng.random(2)
+        self.activationFunction = activationFunction
+        self.activationFunctionDerivative = activationFunctionDerivative
+        print(self.weights)
 
-    def sigmoid(self, x):
-        return 1 / (1 + np.exp(-x))
+    def neuronState(self, inputSamples):
+        return inputSamples@self.weights
 
-    def sigmoidDerivative(self, x):
-        return x * (1 - x)
-
-    def trainNeuron(self, trainingInputs, trainingOutputs, trainingIterations):
-        for i in range(trainingIterations):
-            output = self.learn(trainingInputs)
-            error = trainingOutputs - output
+    def trainNeuron(self, inputSamples, trainingOutputs, epochs):
+        for i in range(epochs):
+            expectedOutput = self.learn(inputSamples)
+            error = trainingOutputs - expectedOutput
             # performing weight adjustments
-            adjustments = np.dot(trainingInputs.T, error * self.sigmoidDerivative(output))
+            adjustments = error * self.activationFunctionDerivative(self.neuronState(inputSamples) * inputSamples)
             self.weights += adjustments
 
-    def learn(self, inputs):
-        inputs = inputs.astype(float)
-        output = self.sigmoid(np.dot(inputs, self.weights))
-        return output
+
+    def learn(self, inputSamples):
+         return self.activationFunction(neuronState(inputSamples))
 
 
+def sigmoid(s):
+    return 1 / (1 + np.exp(-s))
+
+def sigmoidDerivative(y):
+    return y * (1 - y)
+
+def heaviside(s):
+    return 0 if s < 0 else 1
+
+def heavisideDerivative(s):
+    return 1
