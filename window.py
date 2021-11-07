@@ -14,25 +14,61 @@ neuron = None
 classes = []
 
 
+class Point:
+    X = 0
+    Y = 0
+
+    def __init__(self, x, y):
+        self.X = x
+        self.Y = y
+
+
+class Class:
+    Mode = Point(0, 0)
+    xSamples = []  # array of x coordination
+    ySamples = []  # array of y coordination
+    Label = ""
+
+    def __init__(self, mode, xSamples, ySamples, label):
+        self.Mode = mode
+        self.xSamples = xSamples
+        self.ySamples = ySamples
+        self.Label = label
+
+    def getSamples(self):
+        samples = []
+        for i in range(len(self.xSamples)):
+            samples.append([self.xSamples[i], self.ySamples[i]])
+        return samples
+
+
 def initNeuron(activationFunction, activationFunctionDerivative):
     global neuron
     neuron = Neuron(activationFunction, activationFunctionDerivative)
 
 
 def train():
-    xd
+    class_0 = classes[0].getSamples()
+    class_1 = classes[1].getSamples()
+    inputSamples = np.concatenate((class_0, class_1), axis=0)
+    inputSamples = np.c_[inputSamples, np.ones(len(inputSamples)) * -1]
+    neuron.trainNeuron(inputSamples)
 
 
-def generate():
+def generateClasses():
     global classes, modesAmount
     classes = []
     samplesAmount = samplesAmountSlider.get()
+
     x, y = generateModes(modesAmount)
     xn, yn = generateSamples(x, y, samplesAmount)
-    classes.append([x, y, xn, yn, "0"])
+    mode = Point(x, y)
+    classes.append(Class(mode, xn, yn, "0"))
+
     x, y = generateModes(modesAmount)
     xn, yn = generateSamples(x, y, samplesAmount)
-    classes.append([x, y, xn, yn, "1"])
+    mode = Point(x, y)
+    classes.append(Class(mode, xn, yn, "1"))
     print(classes)
 
 
@@ -49,30 +85,7 @@ def generateModes(modesAmount):
     rangeLast = 1
     xClass = rng.uniform(rangeFirst, rangeLast, modesAmount)
     yClass = rng.uniform(rangeFirst, rangeLast, modesAmount)
-    #classLabel = random.choice([0, 1])
     return xClass, yClass
-
-
-# def plot():
-#     samplesAmount = samplesAmountSlider.get()
-#     fig = plt.figure()
-#     ax = fig.add_subplot()
-#     ax.set(title='Data Visualizer - modes and samples', xlabel='x', ylabel='y')
-#
-#     x, y = generateModes(modesAmount)
-#     xn, yn = generateSamples(x, y, samplesAmount)
-#     for i in range(modesAmount):
-#         ax.scatter(x, y, color='magenta', marker='s', label='Numbers')
-#         ax.scatter(xn, yn, color='magenta', marker='.')
-#
-#     x, y = generateModes(modesAmount)
-#     xn, yn = generateSamples(x, y, samplesAmount)
-#     for i in range(modesAmount):
-#         ax.scatter(x, y, color='cyan', marker='s')
-#         ax.scatter(xn, yn, color='cyan', marker='.')
-#
-#     plt.gca().legend(("1 class modes", "1 class sample", "2 class modes", "2 class sample"), loc="best")
-#     plt.show()
 
 
 def plot():
@@ -82,12 +95,12 @@ def plot():
     ax.set(title='Data Visualizer - modes and samples', xlabel='x', ylabel='y')
 
     class_0 = classes[0]
-    ax.scatter(class_0[0], class_0[1], color='magenta', marker='s', label='Numbers')
-    ax.scatter(class_0[2], class_0[3], color='magenta', marker='.')
+    ax.scatter(class_0.Mode.X, class_0.Mode.Y, color='magenta', marker='s', label='Numbers')
+    ax.scatter(class_0.xSamples, class_0.ySamples, color='magenta', marker='.')
 
     class_1 = classes[1]
-    ax.scatter(class_1[0], class_1[1], color='cyan', marker='s')
-    ax.scatter(class_1[2], class_1[3], color='cyan', marker='.')
+    ax.scatter(class_1.Mode.X, class_1.Mode.Y, color='cyan', marker='s')
+    ax.scatter(class_1.xSamples, class_1.ySamples, color='cyan', marker='.')
 
     plt.gca().legend(("1 class modes", "1 class sample", "2 class modes", "2 class sample"), loc="best")
     plt.show()
@@ -97,7 +110,7 @@ samplesAmountSliderlabel = Label(root, text="Please select number of samples").p
 samplesAmountSlider = Scale(root, from_=0, to=100, orient=HORIZONTAL)
 samplesAmountSlider.pack()
 
-buttonPlot = tkinter.Button(root, text="Generate Samples", command=lambda: generate())
+buttonPlot = tkinter.Button(root, text="Generate", command=lambda: generateClasses())
 buttonPlot.pack()
 
 buttonPlot = tkinter.Button(root, text="Plot", command=lambda: plot())
