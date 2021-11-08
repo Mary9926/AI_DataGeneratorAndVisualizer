@@ -27,7 +27,8 @@ class Class:
     Mode = Point(0, 0)
     xSamples = []  # array of x coordination
     ySamples = []  # array of y coordination
-    Label = ""
+    #Label = ""
+    Label = None
 
     def __init__(self, mode, xSamples, ySamples, label):
         self.Mode = mode
@@ -38,7 +39,7 @@ class Class:
     def getSamples(self):
         samples = []
         for i in range(len(self.xSamples)):
-            samples.append([self.xSamples[i], self.ySamples[i]])
+            samples.append([self.xSamples[i], self.ySamples[i], self.Label])
         return samples
 
 
@@ -48,11 +49,15 @@ def initNeuron(activationFunction, activationFunctionDerivative):
 
 
 def train():
-    class_0 = classes[0].getSamples()
-    class_1 = classes[1].getSamples()
-    inputSamples = np.concatenate((class_0, class_1), axis=0)
+    samples_0 = classes[0].getSamples()
+    samples_1 = classes[1].getSamples()
+    allSamples = samples_0 + samples_1
+    np.random.shuffle(allSamples)
+    expectedOutput = np.asmatrix(allSamples)[:, 2].T
+    inputSamples = np.delete(allSamples, 2, 1)
     inputSamples = np.c_[inputSamples, np.ones(len(inputSamples)) * -1]
-    neuron.trainNeuron(inputSamples)
+    #neuron.prepareDecisionBoundary(inputSamples)
+    neuron.trainNeuron(inputSamples, expectedOutput)
 
 
 def generateClasses():
@@ -63,12 +68,14 @@ def generateClasses():
     x, y = generateModes(modesAmount)
     xn, yn = generateSamples(x, y, samplesAmount)
     mode = Point(x, y)
-    classes.append(Class(mode, xn, yn, "0"))
+    #classes.append(Class(mode, xn, yn, "0"))
+    classes.append(Class(mode, xn, yn, 0))
 
     x, y = generateModes(modesAmount)
     xn, yn = generateSamples(x, y, samplesAmount)
     mode = Point(x, y)
-    classes.append(Class(mode, xn, yn, "1"))
+    #classes.append(Class(mode, xn, yn, "1"))
+    classes.append(Class(mode, xn, yn, 1))
     print(classes)
 
 
