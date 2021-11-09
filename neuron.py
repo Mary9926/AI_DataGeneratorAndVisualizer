@@ -8,7 +8,6 @@ class Neuron:
 
     def __init__(self, activationFunction, activationFunctionDerivative):
         rng = np.random.default_rng()
-        # weights of a neuron with 3 inputs
         self.weights = rng.random(3)
         self.activationFunction = activationFunction
         self.activationFunctionDerivative = activationFunctionDerivative
@@ -17,28 +16,12 @@ class Neuron:
         return inputSamples @ self.weights
 
     def trainNeuron(self, inputSamples, expectedOutput):
-        # print("Input Samples: ")
-        # print(inputSamples)
-        # print("Init Weights: ")
-        # print(self.weights)
-        # print("Expected Output: ")
-        # print(expectedOutput)
         for i in range(self.epochs):
             predictedOutput = self.learnNeuron(inputSamples)
-            # print("Output: ")
-            # print(predictedOutput.shape)
-            # print(predictedOutput)
             error = expectedOutput - predictedOutput
-            # print("Error: ")
-            # print(error.shape)
-            # print(error)
-            # print("To: ")
-            # print(self.activationFunctionDerivative(self.neuronState(inputSamples)).reshape(len(inputSamples), 1).shape)
-            # print(self.activationFunctionDerivative(self.neuronState(inputSamples)).reshape(len(inputSamples), 1))
             error = np.mean(error)
-            adjustments = error * self.activationFunctionDerivative(self.neuronState(inputSamples)).reshape(len(inputSamples), 1) * inputSamples
-            # print("Adjustments: ")
-            # print(adjustments)
+            adjustments = error * self.activationFunctionDerivative(self.neuronState(inputSamples)).reshape(
+                len(inputSamples), 1) * inputSamples
             adjustments = np.mean(adjustments, 0)
             self.weights += adjustments
             if np.all(adjustments <= self.epsilon):
@@ -46,7 +29,6 @@ class Neuron:
 
     def learnNeuron(self, inputSamples):
         return self.activationFunction(self.neuronState(inputSamples))
-
 
     def decisionBoundary(self, xx, yy):
         xx = xx.reshape((xx.size, 1))
@@ -72,4 +54,19 @@ def heaviside(s):
 def heavisideDerivative(s):
     return np.ones(s.shape)
 
+
+def sin(s):
+    return np.sin(s)
+
+
+def sinDerivative(s):
+    return np.cos(s)
+
+
+def tanh(s):
+    return np.tanh(s)
+
+
+def tanhDerivative(s):
+    return 1 - (np.tanh(s) * np.tanh(s))
 

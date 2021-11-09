@@ -57,7 +57,7 @@ def train():
     inputSamples = np.delete(allSamples, 2, 1)
     inputSamples = np.c_[inputSamples, np.ones(len(inputSamples)) * -1]
 
-    xx, yy = initBoundary(inputSamples)  #not yet trained data
+    xx, yy = initBoundary(inputSamples)
     neuron.trainNeuron(inputSamples, expectedOutput)
     predictedLabels = neuron.decisionBoundary(xx, yy).reshape((meshgridPoints, meshgridPoints))
 
@@ -66,10 +66,10 @@ def train():
 
 
 def initBoundary(inputSamples):
-    minX = inputSamples[:, 0].min() - 1
-    maxX = inputSamples[:, 0].max() + 1
-    minY = inputSamples[:, 1].min() - 1
-    maxY = inputSamples[:, 1].max() + 1
+    minX = inputSamples[:, 0].min() - 0.5
+    maxX = inputSamples[:, 0].max() + 0.5
+    minY = inputSamples[:, 1].min() - 0.5
+    maxY = inputSamples[:, 1].max() + 0.5
     x = np.linspace(minX, maxX, meshgridPoints)
     y = np.linspace(minY, maxY, meshgridPoints)
     xx, yy = np.meshgrid(x, y)
@@ -82,7 +82,6 @@ def drawBoundary(predictedOutput, xx, yy):
     ax = fig.add_subplot()
     ax.contourf(xx, yy, predictedOutput)
     drawSamples(ax)
-    # here draw samples one again because are hidden
 
 
 def drawSamples(ax):
@@ -93,11 +92,6 @@ def drawSamples(ax):
     class_1 = classes[1]
     ax.scatter(class_1.Mode.X, class_1.Mode.Y, color='cyan', marker='s')
     ax.scatter(class_1.xSamples, class_1.ySamples, color='cyan', marker='.')
-
-    # ax.scatter(classOne[:, 0], self.classOne[:, 1], color=colorOneSamples, marker='D')
-    # ax.scatter(classTwo[:, 0], self.classTwo[:, 1], color=colorTwoSamples, marker='D')
-    # ax.scatter(self.classOneOrigin[:, 0], self.classOneOrigin[:, 1], color=colorOneMode, marker='x', s=100)
-    # ax.scatter(self.classTwoOrigin[:, 0], self.classTwoOrigin[:, 1], color=colorTwoMode, marker='x', s=100)
 
 
 def generateClasses():
@@ -118,7 +112,7 @@ def generateClasses():
 
 
 def generateSamples(xClass, yClass, samplesAmount):
-    devRange = random.uniform(0, 0.2)
+    devRange = random.uniform(0, 0.1)
     xClassNormal = np.random.normal(xClass, devRange, samplesAmount)
     yClassNormal = np.random.normal(yClass, devRange, samplesAmount)
     return xClassNormal, yClassNormal
@@ -155,13 +149,26 @@ samplesAmountSliderlabel = Label(root, text="Please select number of samples").p
 samplesAmountSlider = Scale(root, from_=0, to=100, orient=HORIZONTAL)
 samplesAmountSlider.pack()
 
-buttonPlot = tkinter.Button(root, text="Generate", command=lambda: generateClasses())
+buttonPlot = tkinter.Button(root, text="Generate Samples", command=lambda: generateClasses())
 buttonPlot.pack()
 
 buttonPlot = tkinter.Button(root, text="Plot", command=lambda: plot())
 buttonPlot.pack()
 
-buttonPlot = tkinter.Button(root, text="Init Neuron", command=lambda: initNeuron(heaviside, heavisideDerivative))
+buttonPlot = tkinter.Button(root, text="Init Neuron with sigmoid activation function",
+                            command=lambda: initNeuron(sigmoid, sigmoidDerivative))
+buttonPlot.pack()
+
+buttonPlot = tkinter.Button(root, text="Init Neuron with heaviside activation function",
+                            command=lambda: initNeuron(heaviside, heavisideDerivative))
+buttonPlot.pack()
+
+buttonPlot = tkinter.Button(root, text="Init Neuron with sin activation function",
+                            command=lambda: initNeuron(sin, sinDerivative))
+buttonPlot.pack()
+
+buttonPlot = tkinter.Button(root, text="Init Neuron with tanh activation function",
+                            command=lambda: initNeuron(tanh, tanhDerivative))
 buttonPlot.pack()
 
 buttonPlot = tkinter.Button(root, text="Train Neuron", command=lambda: train())
