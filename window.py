@@ -56,8 +56,36 @@ def train():
     expectedOutput = np.asmatrix(allSamples)[:, 2].T
     inputSamples = np.delete(allSamples, 2, 1)
     inputSamples = np.c_[inputSamples, np.ones(len(inputSamples)) * -1]
-    #neuron.prepareDecisionBoundary(inputSamples)
+
+    xx, yy = prepareDecisionBoundary(inputSamples)  #not yet trained data
+
     neuron.trainNeuron(inputSamples, expectedOutput)
+
+    predictedLabels = neuron.prepareBoundary(xx, yy).reshape((50, 50))
+    drawBoundary(predictedLabels, xx, yy)
+    plt.show()
+
+
+
+def prepareDecisionBoundary(inputSamples):
+    meshgridPoints = 50
+    minX = np.array([0])
+    maxX = np.array([1])
+    minY = np.array([0])
+    maxY = np.array([1])
+    x = np.linspace(minX, maxX, meshgridPoints)
+    y = np.linspace(minY, maxY, meshgridPoints)
+    xx, yy = np.meshgrid(x, y)
+    return xx, yy
+
+
+def drawBoundary(predictedOutput, xx, yy):
+    fig = plt.figure()
+    fig.clear()
+    ax = fig.add_subplot()
+    ax.contourf(xx, yy, predictedOutput)
+    #plot()
+    # here draw sampls one again becouse are hidden
 
 
 def generateClasses():
@@ -68,13 +96,11 @@ def generateClasses():
     x, y = generateModes(modesAmount)
     xn, yn = generateSamples(x, y, samplesAmount)
     mode = Point(x, y)
-    #classes.append(Class(mode, xn, yn, "0"))
     classes.append(Class(mode, xn, yn, 0))
 
     x, y = generateModes(modesAmount)
     xn, yn = generateSamples(x, y, samplesAmount)
     mode = Point(x, y)
-    #classes.append(Class(mode, xn, yn, "1"))
     classes.append(Class(mode, xn, yn, 1))
     print(classes)
 

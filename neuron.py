@@ -3,7 +3,7 @@ from window import *
 
 
 class Neuron:
-    epochs = 10000
+    epochs = 1 #10000
     epsilon = 0.00001
 
     def __init__(self, activationFunction, activationFunctionDerivative):
@@ -22,7 +22,6 @@ class Neuron:
         print("Init Weights: ")
         print(self.weights)
         print("Expected Output: ")
-        #expectedOutput = self.weights[:, np.newaxis].T @ inputSamples.T
         print(expectedOutput)
         for i in range(self.epochs):
             predictedOutput = self.learnNeuron(inputSamples)
@@ -41,7 +40,6 @@ class Neuron:
             print("Adjustments: ")
             print(adjustments)
             adjustments = np.mean(adjustments, 0)
-            #adjustments = adjustments.T
             self.weights += adjustments
             if np.all(adjustments <= self.epsilon):
                 break
@@ -49,39 +47,13 @@ class Neuron:
     def learnNeuron(self, inputSamples):
         return self.activationFunction(self.neuronState(inputSamples))
 
-    def generateBoundary(self, prediction, xx, yy):  # rysowanie
-        self.fig.clear()
-        ax = self.fig.add_subplot()
-        ax.contourf(xx, yy, prediction)  # sam określa kolorki
-        self.drawSamples("red", "darkRed", "green", "darkGreen", ax)
+    def prepareBoundary(self, xx, yy):
+        xx = xx.reshape((xx.size, 1))  # w pojednynczych kolumnach
+        yy = yy.reshape((yy.size, 1))
+        inputSamples = np.c_[xx, yy, -np.ones(np.shape(xx)[0])]  # nie przetrenowana data pytanie czy dobra daje
+        value = inputSamples @ self.weights  # wagi po szkoleniu neurona check if correct
+        return self.activationFunction(value)
 
-    def prepareDecisionBoundary(self, inputSamples):
-        meshgridPoints = 50
-        minX = inputSamples[:, 0], np.array([0])
-        print('minX')
-        print(minX)
-        maxX = np.max(np.append(inputSamples[:, 0], np.array([1])))
-        print('maxX')
-        print(maxX)
-        minY = np.min(np.append(inputSamples[:, 1], np.array([0])))
-        print('minY')
-        print(minY)
-        maxY = np.max(np.append(inputSamples[:, 1], np.array([1])))
-        print('maxY')
-        print(maxY)
-        x = np.linspace(minX, maxX, meshgridPoints)
-        y = np.linspace(minY, maxY, meshgridPoints)
-        xx, yy = np.meshgrid(x, y)
-        print('x')
-        print(x)
-        print('y')
-        print(y)
-        print('xx')
-        print(xx)
-        print('yy')
-        print(yy)
-
-        return xx, yy
 
 
 def sigmoid(s):
