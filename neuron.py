@@ -3,7 +3,7 @@ from window import *
 
 
 class Neuron:
-    epochs = 1 #10000
+    epochs = 10000
     epsilon = 0.00001
 
     def __init__(self, activationFunction, activationFunctionDerivative):
@@ -17,28 +17,28 @@ class Neuron:
         return inputSamples @ self.weights
 
     def trainNeuron(self, inputSamples, expectedOutput):
-        print("Input Samples: ")
-        print(inputSamples)
-        print("Init Weights: ")
-        print(self.weights)
-        print("Expected Output: ")
-        print(expectedOutput)
+        # print("Input Samples: ")
+        # print(inputSamples)
+        # print("Init Weights: ")
+        # print(self.weights)
+        # print("Expected Output: ")
+        # print(expectedOutput)
         for i in range(self.epochs):
             predictedOutput = self.learnNeuron(inputSamples)
-            print("Output: ")
-            print(predictedOutput.shape)
-            print(predictedOutput)
+            # print("Output: ")
+            # print(predictedOutput.shape)
+            # print(predictedOutput)
             error = expectedOutput - predictedOutput
-            print("Error: ")
-            print(error.shape)
-            print(error)
-            print("To: ")
-            print(self.activationFunctionDerivative(self.neuronState(inputSamples)).reshape(len(inputSamples), 1).shape)
-            print(self.activationFunctionDerivative(self.neuronState(inputSamples)).reshape(len(inputSamples), 1))
+            # print("Error: ")
+            # print(error.shape)
+            # print(error)
+            # print("To: ")
+            # print(self.activationFunctionDerivative(self.neuronState(inputSamples)).reshape(len(inputSamples), 1).shape)
+            # print(self.activationFunctionDerivative(self.neuronState(inputSamples)).reshape(len(inputSamples), 1))
             error = np.mean(error)
             adjustments = error * self.activationFunctionDerivative(self.neuronState(inputSamples)).reshape(len(inputSamples), 1) * inputSamples
-            print("Adjustments: ")
-            print(adjustments)
+            # print("Adjustments: ")
+            # print(adjustments)
             adjustments = np.mean(adjustments, 0)
             self.weights += adjustments
             if np.all(adjustments <= self.epsilon):
@@ -47,13 +47,12 @@ class Neuron:
     def learnNeuron(self, inputSamples):
         return self.activationFunction(self.neuronState(inputSamples))
 
-    def prepareBoundary(self, xx, yy):
-        xx = xx.reshape((xx.size, 1))  # w pojednynczych kolumnach
-        yy = yy.reshape((yy.size, 1))
-        inputSamples = np.c_[xx, yy, -np.ones(np.shape(xx)[0])]  # nie przetrenowana data pytanie czy dobra daje
-        value = inputSamples @ self.weights  # wagi po szkoleniu neurona check if correct
-        return self.activationFunction(value)
 
+    def decisionBoundary(self, xx, yy):
+        xx = xx.reshape((xx.size, 1))
+        yy = yy.reshape((yy.size, 1))
+        inputSamples = np.c_[xx, yy, np.ones(len(xx)) * -1]
+        return self.activationFunction(self.neuronState(inputSamples))
 
 
 def sigmoid(s):
@@ -66,10 +65,11 @@ def sigmoidDerivative(s):
 
 
 def heaviside(s):
-    return 0 if s < 0 else 1
+    threshold = 0.5
+    return np.heaviside(s, threshold)
 
 
 def heavisideDerivative(s):
-    return 1
+    return np.ones(s.shape)
 
 
