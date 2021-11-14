@@ -5,6 +5,7 @@ from window import *
 class Neuron:
     epochs = 10000
     epsilon = 0.00001
+    learningRate = 0.0001
 
     def __init__(self, activationFunction, activationFunctionDerivative):
         rng = np.random.default_rng()
@@ -20,7 +21,7 @@ class Neuron:
             predictedOutput = self.learnNeuron(inputSamples)
             error = expectedOutput - predictedOutput
             error = np.mean(error)
-            adjustments = error * self.activationFunctionDerivative(self.neuronState(inputSamples)).reshape(
+            adjustments = self.learningRate * error * self.activationFunctionDerivative(self.neuronState(inputSamples)).reshape(
                 len(inputSamples), 1) * inputSamples
             adjustments = np.mean(adjustments, 0)
             self.weights += adjustments
