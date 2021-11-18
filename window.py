@@ -12,6 +12,7 @@ modesAmount = 1
 samplesAmount = 0
 meshgridPoints = 50
 neuron = None
+neuralNetwork = None
 classes = []
 
 
@@ -63,6 +64,23 @@ def train():
 
     drawBoundary(predictedLabels, xx, yy)
     plt.show()
+
+def trainNeuralNetwork():
+    samples_0 = classes[0].getSamples()
+    samples_1 = classes[1].getSamples()
+    allSamples = samples_0 + samples_1
+    np.random.shuffle(allSamples)
+    expectedLabels = np.asmatrix(allSamples)[:, 2].T
+    inputSamples = np.delete(allSamples, 2, 1)
+    inputSamples = np.c_[inputSamples, np.ones(len(inputSamples)) * -1]
+    neuralNetwork.backPropagation(inputSamples, expectedLabels)
+
+
+def initNeuralNetwork():
+    layer = 3
+    global neuralNetwork
+    neuralNetwork = NeuralNetwork(layer, initNeuron(sigmoid, sigmoidDerivative), initNeuron(sigmoid, sigmoidDerivative))
+
 
 
 def initBoundary(inputSamples):
@@ -155,24 +173,31 @@ buttonPlot.pack()
 buttonPlot = tkinter.Button(root, text="Plot", command=lambda: plot())
 buttonPlot.pack()
 
-buttonPlot = tkinter.Button(root, text="Init Neuron with sigmoid activation function",
-                            command=lambda: initNeuron(sigmoid, sigmoidDerivative))
+buttonPlot = tkinter.Button(root, text="Init NeuralNetwork",
+                            command=lambda: initNeuralNetwork())
 buttonPlot.pack()
 
-buttonPlot = tkinter.Button(root, text="Init Neuron with heaviside activation function",
-                            command=lambda: initNeuron(heaviside, heavisideDerivative))
+buttonPlot = tkinter.Button(root, text="Train NeuralNetwork", command=lambda: initNeuralNetwork())
 buttonPlot.pack()
 
-buttonPlot = tkinter.Button(root, text="Init Neuron with sin activation function",
-                            command=lambda: initNeuron(sin, sinDerivative))
-buttonPlot.pack()
-
-buttonPlot = tkinter.Button(root, text="Init Neuron with tanh activation function",
-                            command=lambda: initNeuron(tanh, tanhDerivative))
-buttonPlot.pack()
-
-buttonPlot = tkinter.Button(root, text="Train Neuron", command=lambda: train())
-buttonPlot.pack()
+# buttonPlot = tkinter.Button(root, text="Init Neuron with sigmoid activation function",
+#                             command=lambda: initNeuron(sigmoid, sigmoidDerivative))
+# buttonPlot.pack()
+#
+# buttonPlot = tkinter.Button(root, text="Init Neuron with heaviside activation function",
+#                             command=lambda: initNeuron(heaviside, heavisideDerivative))
+# buttonPlot.pack()
+#
+# buttonPlot = tkinter.Button(root, text="Init Neuron with sin activation function",
+#                             command=lambda: initNeuron(sin, sinDerivative))
+# buttonPlot.pack()
+#
+# buttonPlot = tkinter.Button(root, text="Init Neuron with tanh activation function",
+#                             command=lambda: initNeuron(tanh, tanhDerivative))
+# buttonPlot.pack()
+#
+# buttonPlot = tkinter.Button(root, text="Train Neuron", command=lambda: train())
+# buttonPlot.pack()
 
 mainMenu = tkinter.Menu()
 root.config(menu=mainMenu)
