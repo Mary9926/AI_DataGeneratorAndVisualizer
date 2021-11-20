@@ -39,38 +39,25 @@ class Neuron:
 
 
 class NeuralNetwork:
-    epochs = 10000
+    epochs = 1#10000
     eta = 0.1
 
-
-    def __init__(self, layers, neuron1, neuron2):
-        rng = np.random.default_rng()
-        weights = []
-        #self.layers = [inputLayer, hiddenLayer, outputLayer]
-        self.layers = [Linear, Activation, Linear, Activation, Linear, Activation]
-        self.neuron1 = neuron1
-        self.neuron2 = neuron2
+    def __init__(self):
         neuronAmount = 2
-       # for i in range(len(layers) - 1):
+        inputAmount = 2
+        self.layers = [Linear(neuronAmount, inputAmount), Activation,
+                       Linear(neuronAmount, inputAmount), Activation,
+                       Linear(neuronAmount, inputAmount), Activation]
 
-        for i in range(0, neuronAmount):
-          #  w = rng.random(layers[i] + 1, layers[i] - 1)  # weights in range (-1, 1)
-            w = rng.random(3)
-            weights.append(w)
-            self.weights = weights
 
-    def forwardPropagation(self, inputSamples):
-        for layer in self.layers:
-            inputSamples = layer.forward(inputSamples)
-        return inputSamples
-
-    def backPropagation(self, inputSamples, expectedLabels):
+    def trainNeuralNetwork(self, inputSamples, expectedOutput):
         for i in range(self.epochs):
-            predictedLabels = self.forwardPropagation(inputSamples)
-            gradient = np.mean((expectedLabels - predictedLabels) * (expectedLabels - predictedLabels))
+            #predictedOutput = Linear.forwardPropagation(self, inputSamples)
+            gradient = np.mean((expectedOutput - predictedOutput) * (expectedOutput - predictedOutput))
             for layer in self.layers[::-1]: #reverse order
-                gradient = layer.back(gradient)
-                predictedLabels = layer.forward(predictedLabels)
+                gradient = layer.backPropagation(gradient)
+            for layer in self.layers:
+                predictedOutput = layer.forwardPropagation(predictedOutput)
                 layer.adjust(eta)
 
     def adjustments(self):
@@ -79,63 +66,53 @@ class NeuralNetwork:
 
 
 class Linear:
-    def __init__(self):
-        self.inputSamples = []
+    
+    def __init__(self, neuronAmount, inputAmount):
+        rng = np.random.default_rng()
+        self.weights = []
+        self.inputAmount = inputAmount
+        self.neuronAmount = neuronAmount
+
+        for i in range(0, neuronAmount):
+            w = rng.random(3)
+            self.weights.append(w)
+        self.weights = np.array(self.weights)
 
     def forwardPropagation(self, inputSamples):
-        return inputSamples @ weigths #state
+        self.inputSamples = inputSamples
+        return self.inputSamples @ self.weights.T
 
     def backPropagation(self, gradient):
         self.gradient = gradient
-        return gradient @ weights
+        print('gradient')
+        print(gradient)
+        print('gradient @ weights')
+        print(self.gradient @ self.weights)
+        return self.gradient @ self.weights
 
-    def adjust(self, eta): # here ask
-        self.weights += eta * gradientOfLoss * inputSamples
+    def adjust(self, eta):
+        print('weights')
+        self.weights += eta * self.gradient * self.inputSamples
+        print(eta * self.gradient * self.inputSamples)
 
 
 class Activation:
 
-    def __init__(self, state):
+    def __init__(self):
         self.state = state
 
     def forwardPropagation(self, state):
-       self.state = state
-       return sigmoid(state)
+        return self.sigmoid(state)
 
     def backPropagation(self, gradient):
-        return gradient * sigmoidDerivative(state)
+        return gradient * sigmoidDerivative(self.state)
 
     def adjust(self, eta):
         pass
 
+    def sigmoid(self, state):
+        b = -6
+        return 1.0 / (1 + np.exp(b * state))
 
-
-def sigmoid(s):
-    b = -6
-    return 1.0 / (1 + np.exp(b * s))
-
-
-def sigmoidDerivative(s):
-    return sigmoid(s) * (1 - sigmoid(s))
-
-
-    #
-    # def forwardPropagation(self, inputSamples): # for evaluation give us a prediction output predicted by network
-    #     for i in enumerate(self.weights):
-    #         networkInputs = inputSamples @ weigths
-    #         activations = self.activationFunction(networkInputs)
-    #         print('activations')
-    #         print(activations)
-    #         return activations
-    #
-    # def backPropagation(self):  # for training
-    #
-    # # for i in np.arange(0,len(leyers) - 2):
-    # #     w = np.random.randn(layers[i] + 1, layers[i + 1] + 1 )
-    # #     self.W.append(w/ np.sqrt(layers[i]))
-    #
-    # def gradientOfActivationFunction(self, learningRate):
-    #     for i in range(len(self.weights)):
-    #         weights = self.weights[i]
-    #         activationFunctionDerivative = self.activationFunctionDerivative[i]
-    #         weights+= activationFunctionDerivative + learningRate
+    def sigmoidDerivative(self, state):
+        return sigmoid(state) * (1 - sigmoid(state))
