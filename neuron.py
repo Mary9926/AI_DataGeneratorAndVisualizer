@@ -47,12 +47,12 @@ class Neuron:
 
 
 class NeuralNetwork:
-    epochs = 1#10000
-    eta = 0.1
+    epochs = 1000
+    eta = 0.01
 
     def __init__(self, samples):
         neuronAmountInInputLayer = 2
-        neuronAmountInHiddenLayer = 3
+        neuronAmountInHiddenLayer = 4
         neuronAmountInOutputLayer = 2
         labelAmount = 1
         self.layers = [Linear(neuronAmountInInputLayer, 2 + labelAmount), Activation(),
@@ -61,7 +61,6 @@ class NeuralNetwork:
         self.expectedOutput = self.getExpectedOutput(samples)
 
         inputSamples = np.delete(samples, 2, 1)
-        #inputSamples = addEmptyColumn(inputSamples)
         self.inputSamples = inputSamples
 
     def getExpectedOutput(self, inputSamples):
@@ -112,7 +111,6 @@ class Linear:
         return self.gradient @ weights
 
     def adjust(self, eta):
-        #self.inputSamples = np.delete(self.inputSamples, 3, 1)
         self.weights += eta * (self.gradient.T @ self.inputSamples)
 
 

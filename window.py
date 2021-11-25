@@ -57,7 +57,13 @@ def initNeuralNetwork():
 
 
 def trainNeuralNetwork():
+    xx, yy = initBoundary(neuralNetwork.inputSamples)
     neuralNetwork.trainNeuralNetwork()
+    input = np.c_[xx.reshape(-1, 1), yy.reshape(-1, 1)]
+    predictedLabels = neuralNetwork.forwardPropagation(input)
+    predictedLabels = predictedLabels[:, 0].reshape(xx.shape)
+    drawBoundary(predictedLabels, xx, yy)
+    plt.show()
 
 
 def initNeuron(activationFunction, activationFunctionDerivative):
@@ -129,7 +135,7 @@ def generateClasses():
 
 
 def generateSamples(xClass, yClass, samplesAmount):
-    devRange = random.uniform(0, 0.1)
+    devRange = random.uniform(0, 0.5)
     xClassNormal = np.random.normal(xClass, devRange, samplesAmount)
     yClassNormal = np.random.normal(yClass, devRange, samplesAmount)
     return xClassNormal, yClassNormal
