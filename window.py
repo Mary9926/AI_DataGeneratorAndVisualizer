@@ -47,9 +47,10 @@ class Class:
 
 
 def initNeuralNetwork():
-    samples_0 = classes[0].getSamples()
-    samples_1 = classes[1].getSamples()
-    allSamples = samples_0 + samples_1
+    allSamples = []
+    for i in range(0, 4):
+        allSamples = allSamples + classes[i].getSamples()
+
     np.random.shuffle(allSamples)
 
     global neuralNetwork
@@ -108,13 +109,15 @@ def drawBoundary(predictedOutput, xx, yy):
 
 
 def drawSamples(ax):
-    class_0 = classes[0]
-    ax.scatter(class_0.Mode.X, class_0.Mode.Y, color='magenta', marker='s', label='Numbers')
-    ax.scatter(class_0.xSamples, class_0.ySamples, color='magenta', marker='.')
+    for i in range(0, 2):
+        class_i = classes[i]
+        ax.scatter(class_i.Mode.X, class_i.Mode.Y, color='magenta', marker='s', label='Numbers')
+        ax.scatter(class_i.xSamples, class_i.ySamples, color='magenta', marker='.')
 
-    class_1 = classes[1]
-    ax.scatter(class_1.Mode.X, class_1.Mode.Y, color='cyan', marker='s')
-    ax.scatter(class_1.xSamples, class_1.ySamples, color='cyan', marker='.')
+    for i in range(2, 4):
+        class_i = classes[i]
+        ax.scatter(class_i.Mode.X, class_i.Mode.Y, color='cyan', marker='s')
+        ax.scatter(class_i.xSamples, class_i.ySamples, color='cyan', marker='.')
 
 
 def generateClasses():
@@ -122,20 +125,21 @@ def generateClasses():
     classes = []
     samplesAmount = samplesAmountSlider.get()
 
-    x, y = generateModes(modesAmount)
-    xn, yn = generateSamples(x, y, samplesAmount)
-    mode = Point(x, y)
-    classes.append(Class(mode, xn, yn, 0))
+    for i in range(0, 2):
+        x, y = generateModes(modesAmount)
+        xn, yn = generateSamples(x, y, samplesAmount)
+        mode = Point(x, y)
+        classes.append(Class(mode, xn, yn, 0))
 
-    x, y = generateModes(modesAmount)
-    xn, yn = generateSamples(x, y, samplesAmount)
-    mode = Point(x, y)
-    classes.append(Class(mode, xn, yn, 1))
-    print(classes)
+    for i in range(0, 2):
+        x, y = generateModes(modesAmount)
+        xn, yn = generateSamples(x, y, samplesAmount)
+        mode = Point(x, y)
+        classes.append(Class(mode, xn, yn, 1))
 
 
 def generateSamples(xClass, yClass, samplesAmount):
-    devRange = random.uniform(0, 0.5)
+    devRange = random.uniform(0, 0.2)
     xClassNormal = np.random.normal(xClass, devRange, samplesAmount)
     yClassNormal = np.random.normal(yClass, devRange, samplesAmount)
     return xClassNormal, yClassNormal
@@ -156,13 +160,15 @@ def plot():
     ax = fig.add_subplot()
     ax.set(title='Data Visualizer - modes and samples', xlabel='x', ylabel='y')
 
-    class_0 = classes[0]
-    ax.scatter(class_0.Mode.X, class_0.Mode.Y, color='magenta', marker='s', label='Numbers')
-    ax.scatter(class_0.xSamples, class_0.ySamples, color='magenta', marker='.')
+    for i in range(0, 2):
+        class_i = classes[i]
+        ax.scatter(class_i.Mode.X, class_i.Mode.Y, color='magenta', marker='s', label='Numbers')
+        ax.scatter(class_i.xSamples, class_i.ySamples, color='magenta', marker='.')
 
-    class_1 = classes[1]
-    ax.scatter(class_1.Mode.X, class_1.Mode.Y, color='cyan', marker='s')
-    ax.scatter(class_1.xSamples, class_1.ySamples, color='cyan', marker='.')
+    for i in range(2, 4):
+        class_i = classes[i]
+        ax.scatter(class_i.Mode.X, class_i.Mode.Y, color='cyan', marker='s')
+        ax.scatter(class_i.xSamples, class_i.ySamples, color='cyan', marker='.')
 
     plt.gca().legend(("1 class modes", "1 class sample", "2 class modes", "2 class sample"), loc="best")
     plt.show()

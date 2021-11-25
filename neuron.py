@@ -47,17 +47,18 @@ class Neuron:
 
 
 class NeuralNetwork:
-    epochs = 1000
-    eta = 0.01
+    epochs = 500
+    eta = 0.05
 
     def __init__(self, samples):
         neuronAmountInInputLayer = 2
         neuronAmountInHiddenLayer = 4
         neuronAmountInOutputLayer = 2
         labelAmount = 1
-        self.layers = [Linear(neuronAmountInInputLayer, 2 + labelAmount), Activation(),
-                       Linear(neuronAmountInHiddenLayer, neuronAmountInInputLayer + labelAmount), Activation(),
-                       Linear(neuronAmountInOutputLayer, neuronAmountInHiddenLayer + labelAmount), Activation()]
+        self.layers = [Layer(Linear(neuronAmountInInputLayer, 2 + labelAmount), Activation()),
+                       Layer(Linear(neuronAmountInHiddenLayer, neuronAmountInInputLayer + labelAmount), Activation()),
+                       Layer(Linear(neuronAmountInHiddenLayer, neuronAmountInHiddenLayer + labelAmount), Activation()),
+                       Layer(Linear(neuronAmountInOutputLayer, neuronAmountInHiddenLayer + labelAmount), Activation())]
         self.expectedOutput = self.getExpectedOutput(samples)
 
         inputSamples = np.delete(samples, 2, 1)
@@ -78,12 +79,10 @@ class NeuralNetwork:
         for epoch in range(self.epochs):
             for i in range(0, len(self.inputSamples)):
                 predictedOutput = self.forwardPropagation(self.inputSamples)
-                sub = np.subtract(self.expectedOutput, predictedOutput)
-                error = np.square(sub).mean()
+                error = np.square(np.subtract(self.expectedOutput, predictedOutput)).mean()
                 gradient = error * predictedOutput
                 for layer in self.layers[::-1]: #reverse order
-                    gradient = layer.backPropagation(gradient)
-                    layer.adjust(self.eta)
+                    gradient = layer.backPropagation(gradient, self.eta)
 
 
 class Linear:
@@ -136,3 +135,22 @@ class Activation:
     def sigmoidDerivative(self, state):
         onesColumn = np.ones(state.shape)
         return self.sigmoid(state) * (onesColumn - self.sigmoid(state))
+
+
+class Layer:
+
+    def __init__(self, linear, activation):
+        self.linear = linear
+        self.activation = activation
+
+    def forwardPropagation(self, inputSamples):
+        inputSamples = self.linear.forwardPropagation(inputSamples)
+        inputSamples = self.activation.forwardPropagation(inputSamples)
+        return inputSamples
+
+    def backPropagation(self, gradient, eta):
+        gradient = self.activation.backPropagation(gradient)
+        self.activation.adjust(eta)
+        gradient = self.linear.backPropagation(gradient)
+        self.linear.adjust(eta)
+        return gradient
