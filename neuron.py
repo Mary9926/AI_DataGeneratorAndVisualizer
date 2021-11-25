@@ -6,6 +6,10 @@ def addEmptyColumn(inputSamples):
     return np.c_[inputSamples, np.ones(len(inputSamples)) * -1]
 
 
+def deleteLastColumn(x):
+    return np.delete(x, len(x[0]) - 1, 1)
+
+
 class Neuron:
     epochs = 10000
     epsilon = 0.00001
@@ -62,7 +66,8 @@ class NeuralNetwork:
 
     def getExpectedOutput(self, inputSamples):
         inputSamples = np.asarray(inputSamples)
-        return inputSamples[:, 2].T
+        expectedOutput = inputSamples[:, 2].T
+        return np.expand_dims(expectedOutput, -1)
 
     def forwardPropagation(self, inputSamples):
         predictedOutput = inputSamples
@@ -74,13 +79,12 @@ class NeuralNetwork:
         for epoch in range(self.epochs):
             for i in range(0, len(self.inputSamples)):
                 predictedOutput = self.forwardPropagation(self.inputSamples)
-                print(predictedOutput)
                 sub = np.subtract(self.expectedOutput, predictedOutput)
-                sq = np.square(sub)
-                gradient = sq.mean()
+                error = np.square(sub).mean()
+                gradient = error * predictedOutput
                 for layer in self.layers[::-1]: #reverse order
                     gradient = layer.backPropagation(gradient)
-                    layer.adjust(eta)
+                    layer.adjust(self.eta)
 
 
 class Linear:
@@ -90,6 +94,7 @@ class Linear:
         self.weights = []
         self.neuronAmount = neuronAmount
         self.inputSamples = []
+        self.gradient = []
 
         for i in range(0, neuronAmount):
             w = rng.random(inputWeightsAmount)
@@ -103,22 +108,25 @@ class Linear:
 
     def backPropagation(self, gradient):
         self.gradient = gradient
-        return self.gradient @ self.weights
+        weights = deleteLastColumn(self.weights)
+        return self.gradient @ weights
 
     def adjust(self, eta):
-        self.weights += eta * self.gradient * self.inputSamples
+        #self.inputSamples = np.delete(self.inputSamples, 3, 1)
+        self.weights += eta * (self.gradient.T @ self.inputSamples)
 
 
 class Activation:
 
     def __init__(self):
-        pass
+        self.state = []
 
     def forwardPropagation(self, state):
+        self.state = state
         return self.sigmoid(state)
 
     def backPropagation(self, gradient):
-        return gradient * sigmoidDerivative(self.state)
+        return self.sigmoidDerivative(self.state) * gradient
 
     def adjust(self, eta):
         pass
@@ -128,4 +136,5 @@ class Activation:
         return 1.0 / (1 + np.exp(b * state))
 
     def sigmoidDerivative(self, state):
-        return sigmoid(state) * (1 - sigmoid(state))
+        onesColumn = np.ones(state.shape)
+        return self.sigmoid(state) * (onesColumn - self.sigmoid(state))
