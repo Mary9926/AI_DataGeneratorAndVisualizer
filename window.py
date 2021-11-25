@@ -13,6 +13,8 @@ samplesAmount = 0
 meshgridPoints = 50
 neuron = None
 neuralNetwork = None
+linear = None
+activation = None
 classes = []
 
 
@@ -45,22 +47,17 @@ class Class:
 
 
 def initNeuralNetwork():
-    global neuralNetwork
-    neuralNetwork = NeuralNetwork()
-
-
-def trainNeuralNetwork():
     samples_0 = classes[0].getSamples()
     samples_1 = classes[1].getSamples()
     allSamples = samples_0 + samples_1
     np.random.shuffle(allSamples)
 
-    expectedOutput = np.asmatrix(allSamples)[:, 2].T
+    global neuralNetwork
+    neuralNetwork = NeuralNetwork(allSamples)
 
-    inputSamples = np.delete(allSamples, 2, 1)
-    inputSamples = np.c_[inputSamples, np.ones(len(inputSamples)) * -1]
 
-    neuralNetwork.trainNeuralNetwork(inputSamples, expectedOutput)
+def trainNeuralNetwork():
+    neuralNetwork.trainNeuralNetwork()
 
 
 def initNeuron(activationFunction, activationFunctionDerivative):
@@ -83,7 +80,6 @@ def train():
 
     drawBoundary(predictedLabels, xx, yy)
     plt.show()
-
 
 
 def initBoundary(inputSamples):

@@ -2,6 +2,10 @@ import numpy as np
 from window import *
 
 
+def addEmptyColumn(inputSamples):
+    return np.c_[inputSamples, np.ones(len(inputSamples)) * -1]
+
+
 class Neuron:
     epochs = 10000
     epsilon = 0.00001
@@ -42,64 +46,73 @@ class NeuralNetwork:
     epochs = 1#10000
     eta = 0.1
 
-    def __init__(self):
-        neuronAmount = 2
-        inputAmount = 2
-        self.layers = [Linear(neuronAmount, inputAmount), Activation,
-                       Linear(neuronAmount, inputAmount), Activation,
-                       Linear(neuronAmount, inputAmount), Activation]
+    def __init__(self, samples):
+        neuronAmountInInputLayer = 2
+        neuronAmountInHiddenLayer = 3
+        neuronAmountInOutputLayer = 2
+        labelAmount = 1
+        self.layers = [Linear(neuronAmountInInputLayer, 2 + labelAmount), Activation(),
+                       Linear(neuronAmountInHiddenLayer, neuronAmountInInputLayer + labelAmount), Activation(),
+                       Linear(neuronAmountInOutputLayer, neuronAmountInHiddenLayer + labelAmount), Activation()]
+        self.expectedOutput = self.getExpectedOutput(samples)
 
+        inputSamples = np.delete(samples, 2, 1)
+        #inputSamples = addEmptyColumn(inputSamples)
+        self.inputSamples = inputSamples
 
-    def trainNeuralNetwork(self, inputSamples, expectedOutput):
-        for i in range(self.epochs):
-            #predictedOutput = Linear.forwardPropagation(self, inputSamples)
-            gradient = np.mean((expectedOutput - predictedOutput) * (expectedOutput - predictedOutput))
-            for layer in self.layers[::-1]: #reverse order
-                gradient = layer.backPropagation(gradient)
-            for layer in self.layers:
-                predictedOutput = layer.forwardPropagation(predictedOutput)
-                layer.adjust(eta)
+    def getExpectedOutput(self, inputSamples):
+        inputSamples = np.asarray(inputSamples)
+        return inputSamples[:, 2].T
 
-    def adjustments(self):
+    def forwardPropagation(self, inputSamples):
+        predictedOutput = inputSamples
         for layer in self.layers:
-            layer.adjust(eta)
+            predictedOutput = layer.forwardPropagation(predictedOutput)
+        return predictedOutput
+
+    def trainNeuralNetwork(self):
+        for epoch in range(self.epochs):
+            for i in range(0, len(self.inputSamples)):
+                predictedOutput = self.forwardPropagation(self.inputSamples)
+                print(predictedOutput)
+                sub = np.subtract(self.expectedOutput, predictedOutput)
+                sq = np.square(sub)
+                gradient = sq.mean()
+                for layer in self.layers[::-1]: #reverse order
+                    gradient = layer.backPropagation(gradient)
+                    layer.adjust(eta)
 
 
 class Linear:
     
-    def __init__(self, neuronAmount, inputAmount):
+    def __init__(self, neuronAmount, inputWeightsAmount):
         rng = np.random.default_rng()
         self.weights = []
-        self.inputAmount = inputAmount
         self.neuronAmount = neuronAmount
+        self.inputSamples = []
 
         for i in range(0, neuronAmount):
-            w = rng.random(3)
+            w = rng.random(inputWeightsAmount)
             self.weights.append(w)
         self.weights = np.array(self.weights)
 
     def forwardPropagation(self, inputSamples):
+        inputSamples = addEmptyColumn(inputSamples)
         self.inputSamples = inputSamples
         return self.inputSamples @ self.weights.T
 
     def backPropagation(self, gradient):
         self.gradient = gradient
-        print('gradient')
-        print(gradient)
-        print('gradient @ weights')
-        print(self.gradient @ self.weights)
         return self.gradient @ self.weights
 
     def adjust(self, eta):
-        print('weights')
         self.weights += eta * self.gradient * self.inputSamples
-        print(eta * self.gradient * self.inputSamples)
 
 
 class Activation:
 
     def __init__(self):
-        self.state = state
+        pass
 
     def forwardPropagation(self, state):
         return self.sigmoid(state)
